@@ -4,6 +4,7 @@ import com.epam.springsecuritytestapp.domain.AppUser;
 import com.epam.springsecuritytestapp.domain.AuthProvider;
 import com.epam.springsecuritytestapp.service.UserService;
 import com.epam.springsecuritytestapp.security.AppUserPrincipal;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
  * Used for OpenID Connect providers (Google). Spring calls it after exchanging
  * the authorization code; we map the OIDC user to our own {@link AppUser}.
  */
+@Slf4j
 @Service
 public class AppOidcUserService implements OAuth2UserService<OidcUserRequest, OidcUser> {
 
@@ -37,6 +39,8 @@ public class AppOidcUserService implements OAuth2UserService<OidcUserRequest, Oi
     public OidcUser loadUser(OidcUserRequest request) {
         OidcUser oidcUser = delegate.loadUser(request);
         if (oidcUser.getEmail() == null || !Boolean.TRUE.equals(oidcUser.getEmailVerified())) {
+            log.warn("OIDC login rejected: no verified email provider={} subject={}",
+                    request.getClientRegistration().getRegistrationId(), oidcUser.getSubject());
             throw new OAuth2AuthenticationException(
                     new OAuth2Error("unverified_email", "The provider did not return a verified email", null));
         }

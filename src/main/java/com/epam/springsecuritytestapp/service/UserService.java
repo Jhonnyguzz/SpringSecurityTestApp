@@ -5,6 +5,7 @@ import com.epam.springsecuritytestapp.domain.AuthProvider;
 import com.epam.springsecuritytestapp.dto.RegistrationForm;
 import com.epam.springsecuritytestapp.repository.AppUserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +15,7 @@ import org.springframework.util.StringUtils;
  * Single place where {@link AppUser}s are created, whatever the login method:
  * form registration (LOCAL) or first OAuth2 login (GOOGLE / GITHUB).
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -27,9 +29,12 @@ public class UserService {
     public AppUser registerLocal(RegistrationForm form) {
         String email = normalizeEmail(form.getEmail());
         if (userRepository.existsByEmailIgnoreCase(email)) {
+            log.info("Registration rejected: email already registered email={}", email);
             throw new EmailAlreadyRegisteredException(email);
         }
-        return create(email, form.getName(), passwordEncoder.encode(form.getPassword()), AuthProvider.LOCAL);
+        AppUser user = create(email, form.getName(), passwordEncoder.encode(form.getPassword()), AuthProvider.LOCAL);
+        log.info("Local user registered id={} email={}", user.getId(), email);
+        return user;
     }
 
     /**
@@ -40,7 +45,16 @@ public class UserService {
     public AppUser findOrCreateExternal(String verifiedEmail, String name, AuthProvider provider) {
         String email = normalizeEmail(verifiedEmail);
         return userRepository.findByEmailIgnoreCase(email)
-                .orElseGet(() -> create(email, name, null, provider));
+                .map(existing -> {
+                    log.debug("{} login linked to existing user id={} email={} (created via {})",
+                            provider, existing.getId(), email, existing.getProvider());
+                    return existing;
+                })
+                .orElseGet(() -> {
+                    AppUser user = create(email, name, null, provider);
+                    log.info("User created on first {} login id={} email={}", provider, user.getId(), email);
+                    return user;
+                });
     }
 
     private AppUser create(String email, String name, String encodedPassword, AuthProvider provider) {

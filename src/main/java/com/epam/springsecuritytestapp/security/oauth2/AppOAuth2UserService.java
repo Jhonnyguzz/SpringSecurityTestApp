@@ -4,6 +4,7 @@ import com.epam.springsecuritytestapp.domain.AppUser;
 import com.epam.springsecuritytestapp.domain.AuthProvider;
 import com.epam.springsecuritytestapp.service.UserService;
 import com.epam.springsecuritytestapp.security.AppUserPrincipal;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -21,6 +22,7 @@ import java.util.List;
  * Used for plain OAuth2 providers (GitHub). GitHub's user-info may not include
  * the email (private emails), so we ask /user/emails for the primary verified one.
  */
+@Slf4j
 @Service
 public class AppOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
@@ -48,6 +50,7 @@ public class AppOAuth2UserService implements OAuth2UserService<OAuth2UserRequest
         OAuth2User oauth2User = delegate.loadUser(request);
         String registrationId = request.getClientRegistration().getRegistrationId();
         if (!"github".equals(registrationId)) {
+            log.warn("OAuth2 login rejected: unsupported provider={}", registrationId);
             throw new OAuth2AuthenticationException(
                     new OAuth2Error("unsupported_provider", "Unsupported provider: " + registrationId, null));
         }
@@ -71,8 +74,11 @@ public class AppOAuth2UserService implements OAuth2UserService<OAuth2UserRequest
                 .filter(e -> e.primary() && e.verified())
                 .map(GithubEmail::email)
                 .findFirst()
-                .orElseThrow(() -> new OAuth2AuthenticationException(
-                        new OAuth2Error("unverified_email", "GitHub account has no primary verified email", null)));
+                .orElseThrow(() -> {
+                    log.warn("GitHub login rejected: account has no primary verified email");
+                    return new OAuth2AuthenticationException(
+                            new OAuth2Error("unverified_email", "GitHub account has no primary verified email", null));
+                });
     }
 
     record GithubEmail(String email, boolean primary, boolean verified) {

@@ -2,8 +2,11 @@ package com.epam.springsecuritytestapp.config;
 
 import com.epam.springsecuritytestapp.security.oauth2.AppOAuth2UserService;
 import com.epam.springsecuritytestapp.security.oauth2.AppOidcUserService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authorization.AuthorizationEventPublisher;
+import org.springframework.security.authorization.SpringAuthorizationEventPublisher;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -21,6 +24,15 @@ public class SecurityConfig {
     @Bean
     PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+    /**
+     * Authentication events are published by default; authorization (access denied)
+     * events only when this bean exists. Both are logged by SecurityEventLogger.
+     */
+    @Bean
+    AuthorizationEventPublisher authorizationEventPublisher(ApplicationEventPublisher publisher) {
+        return new SpringAuthorizationEventPublisher(publisher);
     }
 
     @Bean

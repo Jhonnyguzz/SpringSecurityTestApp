@@ -5,12 +5,14 @@ import com.epam.springsecuritytestapp.dto.SongForm;
 import com.epam.springsecuritytestapp.repository.SongRepository;
 import com.epam.springsecuritytestapp.security.AppUserPrincipal;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SongService {
@@ -30,6 +32,8 @@ public class SongService {
         // Taken from the authenticated principal, never from the request
         song.setAddedBy(user.getEmail());
         song.setCreatedAt(Instant.now());
-        return songRepository.save(song);
+        Song saved = songRepository.save(song);
+        log.info("Song added id={} title='{}' artist='{}' by={}", saved.getId(), saved.getTitle(), saved.getArtist(), saved.getAddedBy());
+        return saved;
     }
 }

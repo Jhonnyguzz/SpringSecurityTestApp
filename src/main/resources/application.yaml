@@ -19,3 +19,9 @@ spring:
             client-id: ${GITHUB_CLIENT_ID:replace-me}
             client-secret: ${GITHUB_CLIENT_SECRET:replace-me}
             scope: read:user, user:email
+
+logging:
+  level:
+    com.epam.springsecuritytestapp: DEBUG
+    # Set to DEBUG or TRACE to see every security filter and decision
+    org.springframework.security: INFO
