@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SongBox - Home</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<header class="navbar">
+    <a class="brand" th:href="@{/}">🎵 SongBox</a>
+    <nav>
+        <a sec:authorize="isAnonymous()" class="btn btn-primary" th:href="@{/login}">Sign in</a>
+        <div sec:authorize="isAuthenticated()" class="user-box">
+            <span>Hola, <strong sec:authentication="name">user</strong></span>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="btn btn-outline">Sign out</button>
+            </form>
+        </div>
+    </nav>
+</header>
+
+<main class="container">
+    <section class="hero">
+        <h1>Comparte la música que te gusta</h1>
+        <p>Descubre las canciones que la comunidad ha agregado recientemente.</p>
+    </section>
+
+    <section class="card">
+        <h2>Últimas 5 canciones agregadas</h2>
+
+        <p th:if="${#lists.isEmpty(latestSongs)}" class="empty">Aún no se han agregado canciones.</p>
+
+        <ul th:unless="${#lists.isEmpty(latestSongs)}" class="song-list">
+            <li th:each="song : ${latestSongs}" class="song-item">
+                <div class="song-info">
+                    <span class="song-title" th:text="${song.title}">Título</span>
+                    <span class="song-artist" th:text="${song.artist}">Artista</span>
+                </div>
+                <div class="song-meta">
+                    <span class="song-user" th:text="'por ' + ${song.addedBy}">por usuario</span>
+                    <time class="song-date"
+                          th:text="${#temporals.format(song.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2026</time>
+                </div>
+            </li>
+        </ul>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,120 @@
+:root {
+    --primary: #6c5ce7;
+    --primary-dark: #5a4bd1;
+    --bg: #f5f6fa;
+    --text: #2d3436;
+    --muted: #636e72;
+    --border: #dfe6e9;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+}
+
+.brand {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.user-box { display: flex; align-items: center; gap: 1rem; }
+.user-box form { margin: 0; }
+
+.container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+.container.narrow { max-width: 420px; }
+
+.hero { text-align: center; margin-bottom: 2rem; }
+.hero h1 { margin-bottom: .5rem; }
+.hero p { color: var(--muted); }
+
+.card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
+}
+
+.card h2 { margin-top: 0; }
+
+.song-list { list-style: none; padding: 0; margin: 0; }
+
+.song-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .9rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.song-item:last-child { border-bottom: none; }
+.song-info, .song-meta { display: flex; flex-direction: column; }
+.song-meta { text-align: right; }
+.song-title { font-weight: 600; }
+.song-artist, .song-date { color: var(--muted); font-size: .9rem; }
+.song-user { color: var(--primary); font-size: .9rem; }
+.empty { color: var(--muted); }
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    padding: .6rem 1.2rem;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    font-size: 1rem;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-outline { background: #fff; color: var(--primary); border-color: var(--primary); }
+.btn-google { background: #fff; color: var(--text); border-color: var(--border); }
+.btn-google:hover { background: #f1f2f6; }
+.btn-github { background: #24292f; color: #fff; margin-top: .6rem; }
+.btn-github:hover { background: #32383f; }
+.btn-block { width: 100%; }
+
+.login-form { display: flex; flex-direction: column; gap: .5rem; }
+.login-form label { font-weight: 600; font-size: .9rem; }
+.login-form input {
+    padding: .6rem .8rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    margin-bottom: .5rem;
+}
+.login-form button { margin-top: .5rem; }
+
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 1.2rem 0;
+    color: var(--muted);
+}
+.divider::before, .divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid var(--border);
+}
+.divider span { padding: 0 .8rem; }
+
+.alert { padding: .7rem 1rem; border-radius: 8px; margin-bottom: 1rem; }
+.alert-error { background: #ffe5e5; color: #c0392b; }
+.alert-info { background: #e8f4fd; color: #2471a3; }
