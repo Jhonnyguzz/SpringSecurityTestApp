@@ -68,6 +68,7 @@ body {
 .song-artist, .song-date { color: var(--muted); font-size: .9rem; }
 .song-user { color: var(--primary); font-size: .9rem; }
 .empty { color: var(--muted); }
+.card-actions { text-align: center; margin-top: 1.2rem; }
 
 .btn {
     display: inline-flex;

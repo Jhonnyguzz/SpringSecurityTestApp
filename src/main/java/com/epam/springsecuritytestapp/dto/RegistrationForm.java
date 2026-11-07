@@ -1,4 +1,4 @@
-package com.epam.springsecuritytestapp.user;
+package com.epam.springsecuritytestapp.dto;
 
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
@@ -23,6 +23,7 @@ public class RegistrationForm {
     @Size(min = 8, max = 72, message = "La clave debe tener entre 8 y 72 caracteres")
     private String password;
 
+    @NotBlank(message = "La confirmación de la clave es obligatoria")
     private String confirmPassword;
 
     @AssertTrue(message = "Las claves no coinciden")

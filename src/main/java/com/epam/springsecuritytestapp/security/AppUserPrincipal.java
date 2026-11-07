@@ -1,5 +1,7 @@
-package com.epam.springsecuritytestapp.user;
+package com.epam.springsecuritytestapp.security;
 
+import com.epam.springsecuritytestapp.domain.AppUser;
+import com.epam.springsecuritytestapp.domain.AuthProvider;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

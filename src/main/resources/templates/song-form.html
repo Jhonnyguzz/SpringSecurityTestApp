@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SongBox - Agregar canción</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<header class="navbar">
+    <a class="brand" th:href="@{/}">🎵 SongBox</a>
+</header>
+
+<main class="container narrow">
+    <section class="card">
+        <h2>Agregar canción</h2>
+
+        <form th:action="@{/songs}" th:object="${form}" method="post" class="login-form" novalidate>
+            <label for="title">Título</label>
+            <input type="text" id="title" th:field="*{title}" placeholder="Nombre de la canción" required autofocus>
+            <p class="field-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Error</p>
+
+            <label for="artist">Artista</label>
+            <input type="text" id="artist" th:field="*{artist}" placeholder="Artista o banda" required>
+            <p class="field-error" th:if="${#fields.hasErrors('artist')}" th:errors="*{artist}">Error</p>
+
+            <button type="submit" class="btn btn-primary btn-block">Agregar</button>
+        </form>
+
+        <p class="switch-link"><a th:href="@{/}">Volver al inicio</a></p>
+    </section>
+</main>
+</body>
+</html>

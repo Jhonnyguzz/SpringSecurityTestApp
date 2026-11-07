@@ -1,6 +1,6 @@
-package com.epam.springsecuritytestapp.web;
+package com.epam.springsecuritytestapp.controller;
 
-import com.epam.springsecuritytestapp.song.SongRepository;
+import com.epam.springsecuritytestapp.repository.SongRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

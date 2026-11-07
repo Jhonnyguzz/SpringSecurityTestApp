@@ -1,5 +1,9 @@
-package com.epam.springsecuritytestapp.user;
+package com.epam.springsecuritytestapp.security.oauth2;
 
+import com.epam.springsecuritytestapp.domain.AppUser;
+import com.epam.springsecuritytestapp.domain.AuthProvider;
+import com.epam.springsecuritytestapp.service.UserService;
+import com.epam.springsecuritytestapp.security.AppUserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -23,19 +27,19 @@ public class AppOAuth2UserService implements OAuth2UserService<OAuth2UserRequest
     private static final String GITHUB_EMAILS_URL = "https://api.github.com/user/emails";
 
     private final OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate;
-    private final OAuth2UserProvisioner provisioner;
+    private final UserService userService;
     private final RestClient restClient;
 
     @Autowired
-    public AppOAuth2UserService(OAuth2UserProvisioner provisioner) {
-        this(new DefaultOAuth2UserService(), provisioner, RestClient.create());
+    public AppOAuth2UserService(UserService userService) {
+        this(new DefaultOAuth2UserService(), userService, RestClient.create());
     }
 
     AppOAuth2UserService(OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate,
-                         OAuth2UserProvisioner provisioner,
+                         UserService userService,
                          RestClient restClient) {
         this.delegate = delegate;
-        this.provisioner = provisioner;
+        this.userService = userService;
         this.restClient = restClient;
     }
 
@@ -53,7 +57,7 @@ public class AppOAuth2UserService implements OAuth2UserService<OAuth2UserRequest
         if (name == null) {
             name = oauth2User.getAttribute("login");
         }
-        AppUser user = provisioner.findOrCreate(email, name, AuthProvider.GITHUB);
+        AppUser user = userService.findOrCreateExternal(email, name, AuthProvider.GITHUB);
         return AppUserPrincipal.oauth2(user, oauth2User.getAttributes());
     }
 

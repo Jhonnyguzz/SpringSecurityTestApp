@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SongBox - Todas las canciones</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<header class="navbar">
+    <a class="brand" th:href="@{/}">🎵 SongBox</a>
+    <nav>
+        <div class="user-box">
+            <span>Hola, <strong sec:authentication="principal.displayName">user</strong></span>
+            <a class="btn btn-primary" th:href="@{/songs/new}">Agregar canción</a>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="btn btn-outline">Sign out</button>
+            </form>
+        </div>
+    </nav>
+</header>
+
+<main class="container">
+    <section class="card">
+        <h2 th:text="|Todas las canciones (${#lists.size(songs)})|">Todas las canciones</h2>
+
+        <p th:if="${#lists.isEmpty(songs)}" class="empty">Aún no se han agregado canciones.</p>
+
+        <ul th:unless="${#lists.isEmpty(songs)}" class="song-list">
+            <li th:each="song : ${songs}" class="song-item">
+                <div class="song-info">
+                    <span class="song-title" th:text="${song.title}">Título</span>
+                    <span class="song-artist" th:text="${song.artist}">Artista</span>
+                </div>
+                <div class="song-meta">
+                    <span class="song-user" th:text="'por ' + ${song.addedBy}">por usuario</span>
+                    <time class="song-date"
+                          th:text="${#temporals.format(song.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2026</time>
+                </div>
+            </li>
+        </ul>
+
+        <p class="switch-link"><a th:href="@{/}">Volver al inicio</a></p>
+    </section>
+</main>
+</body>
+</html>

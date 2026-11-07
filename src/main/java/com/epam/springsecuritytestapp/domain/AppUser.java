@@ -1,4 +1,4 @@
-package com.epam.springsecuritytestapp.user;
+package com.epam.springsecuritytestapp.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

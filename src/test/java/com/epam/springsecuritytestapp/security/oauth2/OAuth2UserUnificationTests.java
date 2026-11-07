@@ -1,13 +1,19 @@
-package com.epam.springsecuritytestapp.user;
+package com.epam.springsecuritytestapp.security.oauth2;
 
+import com.epam.springsecuritytestapp.domain.AuthProvider;
+import com.epam.springsecuritytestapp.service.UserService;
+import com.epam.springsecuritytestapp.repository.AppUserRepository;
+import com.epam.springsecuritytestapp.security.AppUserPrincipal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -36,13 +42,16 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 class OAuth2UserUnificationTests {
 
     @Autowired
-    private OAuth2UserProvisioner provisioner;
+    private UserService userService;
 
     @Autowired
     private AppUserRepository userRepository;
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private final OAuth2AccessToken accessToken = new OAuth2AccessToken(
             OAuth2AccessToken.TokenType.BEARER, "token-123", Instant.now(), Instant.now().plusSeconds(60));
@@ -56,7 +65,7 @@ class OAuth2UserUnificationTests {
         githubApi = MockRestServiceServer.bindTo(builder).build();
         OAuth2User githubUser = new DefaultOAuth2User(List.of(),
                 Map.of("id", 42, "login", "octocat", "name", "The Octocat"), "id");
-        githubService = new AppOAuth2UserService(request -> githubUser, provisioner, builder.build());
+        githubService = new AppOAuth2UserService(request -> githubUser, userService, builder.build());
     }
 
     @Test
@@ -87,6 +96,23 @@ class OAuth2UserUnificationTests {
         assertThat(principal.getDisplayName()).isEqualTo("Admin");
         assertThat(principal.getProvider()).isEqualTo(AuthProvider.LOCAL);
         assertThat(principal.getAuthorities()).extracting("authority").containsExactly("ROLE_ADMIN");
+        assertThat(userRepository.count()).isEqualTo(usersBefore);
+        UserDetails formLogin = userDetailsService.loadUserByUsername("admin@example.com");
+        assertThat(passwordEncoder.matches("admin", formLogin.getPassword())).isTrue();
+    }
+
+    @Test
+    void secondProviderReusesAccountCreatedByFirstProvider() {
+        AppUserPrincipal google = (AppUserPrincipal) googleService(true).loadUser(googleRequest(true));
+        respondWithGithubEmails("""
+                [{"email":"Ana@Gmail.com","primary":true,"verified":true}]""");
+        long usersBefore = userRepository.count();
+
+        AppUserPrincipal github = (AppUserPrincipal) githubService.loadUser(githubRequest());
+
+        assertThat(github.getId()).isEqualTo(google.getId());
+        assertThat(github.getProvider()).isEqualTo(AuthProvider.GOOGLE);
+        assertThat(github.getDisplayName()).isEqualTo("Ana Gómez");
         assertThat(userRepository.count()).isEqualTo(usersBefore);
     }
 
@@ -119,7 +145,7 @@ class OAuth2UserUnificationTests {
 
     @Test
     void oauth2UsersCannotUseFormLogin() {
-        provisioner.findOrCreate("ana@gmail.com", "Ana", AuthProvider.GOOGLE);
+        userService.findOrCreateExternal("ana@gmail.com", "Ana", AuthProvider.GOOGLE);
 
         assertThatThrownBy(() -> userDetailsService.loadUserByUsername("ana@gmail.com"))
                 .isInstanceOf(UsernameNotFoundException.class);
@@ -140,7 +166,7 @@ class OAuth2UserUnificationTests {
     }
 
     private AppOidcUserService googleService(boolean emailVerified) {
-        return new AppOidcUserService(request -> new DefaultOidcUser(List.of(), idToken(emailVerified)), provisioner);
+        return new AppOidcUserService(request -> new DefaultOidcUser(List.of(), idToken(emailVerified)), userService);
     }
 
     private OidcUserRequest googleRequest(boolean emailVerified) {

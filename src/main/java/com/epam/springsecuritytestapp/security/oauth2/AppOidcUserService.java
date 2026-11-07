@@ -1,5 +1,9 @@
-package com.epam.springsecuritytestapp.user;
+package com.epam.springsecuritytestapp.security.oauth2;
 
+import com.epam.springsecuritytestapp.domain.AppUser;
+import com.epam.springsecuritytestapp.domain.AuthProvider;
+import com.epam.springsecuritytestapp.service.UserService;
+import com.epam.springsecuritytestapp.security.AppUserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
@@ -17,16 +21,16 @@ import org.springframework.stereotype.Service;
 public class AppOidcUserService implements OAuth2UserService<OidcUserRequest, OidcUser> {
 
     private final OAuth2UserService<OidcUserRequest, OidcUser> delegate;
-    private final OAuth2UserProvisioner provisioner;
+    private final UserService userService;
 
     @Autowired
-    public AppOidcUserService(OAuth2UserProvisioner provisioner) {
-        this(new OidcUserService(), provisioner);
+    public AppOidcUserService(UserService userService) {
+        this(new OidcUserService(), userService);
     }
 
-    AppOidcUserService(OAuth2UserService<OidcUserRequest, OidcUser> delegate, OAuth2UserProvisioner provisioner) {
+    AppOidcUserService(OAuth2UserService<OidcUserRequest, OidcUser> delegate, UserService userService) {
         this.delegate = delegate;
-        this.provisioner = provisioner;
+        this.userService = userService;
     }
 
     @Override
@@ -38,7 +42,7 @@ public class AppOidcUserService implements OAuth2UserService<OidcUserRequest, Oi
         }
         AuthProvider provider = AuthProvider.valueOf(
                 request.getClientRegistration().getRegistrationId().toUpperCase());
-        AppUser user = provisioner.findOrCreate(oidcUser.getEmail(), oidcUser.getFullName(), provider);
+        AppUser user = userService.findOrCreateExternal(oidcUser.getEmail(), oidcUser.getFullName(), provider);
         return AppUserPrincipal.oidc(user, oidcUser);
     }
 }
