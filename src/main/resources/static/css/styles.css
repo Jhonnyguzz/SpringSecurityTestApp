@@ -118,3 +118,8 @@ body {
 .alert { padding: .7rem 1rem; border-radius: 8px; margin-bottom: 1rem; }
 .alert-error { background: #ffe5e5; color: #c0392b; }
 .alert-info { background: #e8f4fd; color: #2471a3; }
+.alert-success { background: #e6f9ee; color: #1e8449; }
+
+.field-error { color: #c0392b; font-size: .85rem; margin: -.4rem 0 .4rem; }
+.switch-link { text-align: center; margin-top: 1.2rem; color: var(--muted); }
+.switch-link a { color: var(--primary); }

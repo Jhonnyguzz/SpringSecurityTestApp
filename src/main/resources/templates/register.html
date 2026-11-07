@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SongBox - Registro</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<header class="navbar">
+    <a class="brand" th:href="@{/}">🎵 SongBox</a>
+</header>
+
+<main class="container narrow">
+    <section class="card">
+        <h2>Crear cuenta</h2>
+
+        <form th:action="@{/register}" th:object="${form}" method="post" class="login-form" novalidate>
+            <label for="name">Nombre</label>
+            <input type="text" id="name" th:field="*{name}" placeholder="Tu nombre" required autofocus>
+            <p class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Error</p>
+
+            <label for="email">Correo</label>
+            <input type="email" id="email" th:field="*{email}" placeholder="tu@correo.com" required>
+            <p class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Error</p>
+
+            <label for="password">Clave</label>
+            <input type="password" id="password" th:field="*{password}" placeholder="Mínimo 8 caracteres" required>
+            <p class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Error</p>
+
+            <label for="confirmPassword">Confirmar clave</label>
+            <input type="password" id="confirmPassword" th:field="*{confirmPassword}" required>
+            <p class="field-error" th:if="${#fields.hasErrors('passwordConfirmed')}" th:errors="*{passwordConfirmed}">Error</p>
+
+            <button type="submit" class="btn btn-primary btn-block">Registrarme</button>
+        </form>
+
+        <p class="switch-link">¿Ya tienes cuenta? <a th:href="@{/login}">Sign in</a></p>
+    </section>
+</main>
+</body>
+</html>

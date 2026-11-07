@@ -11,9 +11,12 @@
 <header class="navbar">
     <a class="brand" th:href="@{/}">🎵 SongBox</a>
     <nav>
-        <a sec:authorize="isAnonymous()" class="btn btn-primary" th:href="@{/login}">Sign in</a>
+        <div sec:authorize="isAnonymous()" class="user-box">
+            <a class="btn btn-outline" th:href="@{/register}">Sign up</a>
+            <a class="btn btn-primary" th:href="@{/login}">Sign in</a>
+        </div>
         <div sec:authorize="isAuthenticated()" class="user-box">
-            <span>Hola, <strong sec:authentication="name">user</strong></span>
+            <span>Hola, <strong sec:authentication="principal.displayName">user</strong></span>
             <form th:action="@{/logout}" method="post">
                 <button type="submit" class="btn btn-outline">Sign out</button>
             </form>

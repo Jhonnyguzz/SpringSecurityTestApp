@@ -8,10 +8,6 @@ spring:
       ddl-auto: create-drop
     defer-datasource-initialization: true
   security:
-    user:
-      # Temporary in-memory user for testing the form login
-      name: admin@example.com
-      password: admin
     oauth2:
       client:
         registration:
@@ -23,7 +19,3 @@ spring:
             client-id: ${GITHUB_CLIENT_ID:replace-me}
             client-secret: ${GITHUB_CLIENT_SECRET:replace-me}
             scope: read:user, user:email
-        provider:
-          github:
-            # Show the GitHub username instead of the numeric id
-            user-name-attribute: login
