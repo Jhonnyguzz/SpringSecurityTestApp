@@ -25,6 +25,8 @@
     <section class="card">
         <h2 th:text="|Todas las canciones (${#lists.size(songs)})|">Todas las canciones</h2>
 
+        <div th:if="${param.deleted}" class="alert alert-info">Canción eliminada.</div>
+
         <p th:if="${#lists.isEmpty(songs)}" class="empty">Aún no se han agregado canciones.</p>
 
         <ul th:unless="${#lists.isEmpty(songs)}" class="song-list">
@@ -37,6 +39,11 @@
                     <span class="song-user" th:text="'por ' + ${song.addedBy}">por usuario</span>
                     <time class="song-date"
                           th:text="${#temporals.format(song.createdAt, 'dd/MM/yyyy HH:mm')}">01/01/2026</time>
+                    <form sec:authorize="hasRole('ADMIN')" class="song-delete"
+                          th:action="@{/songs/{id}/delete(id=${song.id})}" method="post"
+                          onsubmit="return confirm('¿Eliminar esta canción?');">
+                        <button type="submit" class="btn btn-danger btn-small">Eliminar</button>
+                    </form>
                 </div>
             </li>
         </ul>

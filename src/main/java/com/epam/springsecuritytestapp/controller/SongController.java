@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -42,5 +43,12 @@ public class SongController {
         }
         songService.addSong(form, user);
         return "redirect:/?added";
+    }
+
+    // POST instead of DELETE because HTML forms only support GET/POST (and it carries the CSRF token)
+    @PostMapping("/{id}/delete")
+    public String deleteSong(@PathVariable Long id, @AuthenticationPrincipal AppUserPrincipal user) {
+        songService.deleteSong(id, user);
+        return "redirect:/songs?deleted";
     }
 }

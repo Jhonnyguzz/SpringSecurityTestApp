@@ -5,6 +5,8 @@ import com.epam.springsecuritytestapp.security.oauth2.AppOidcUserService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.authorization.AuthorizationEventPublisher;
 import org.springframework.security.authorization.SpringAuthorizationEventPublisher;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,6 +17,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity(debug = true)
+@EnableMethodSecurity
 public class SecurityConfig {
 
     /**
@@ -42,6 +45,7 @@ public class SecurityConfig {
         return http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/login", "/register", "/css/**", "/error").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/songs/*/delete").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")
