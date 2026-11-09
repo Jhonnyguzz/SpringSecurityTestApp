@@ -11,6 +11,8 @@ import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +41,8 @@ public class AppUserPrincipal implements UserDetails, OidcUser {
         this.password = user.getPassword();
         this.provider = user.getProvider();
         this.authorities = List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
-        this.attributes = Map.copyOf(attributes);
+        // Map.copyOf rejects null values, and GitHub returns several (e.g. "company", "bio").
+        this.attributes = Collections.unmodifiableMap(new LinkedHashMap<>(attributes));
         this.idToken = idToken;
         this.userInfo = userInfo;
     }
